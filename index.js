@@ -32,7 +32,7 @@ app.use(helmet());
 // );
 
 app.get("/", (req, res) => {
-  return res.send("Hiiii!!!");
+  return res.send("Hiiii!!!, v1.1");
 });
 
 app.use("/api/login", authRoute);
