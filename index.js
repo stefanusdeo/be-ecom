@@ -19,17 +19,17 @@ app.use(express.json());
 app.use(cors());
 app.use(helmet());
 
-var accessLogStream = fs.createWriteStream("./access.log", { flags: "a" });
+// var accessLogStream = fs.createWriteStream("./access.log", { flags: "a" });
 
 // setup the logger
-app.use(
-  morgan("common", {
-    stream: accessLogStream,
-    skip: function (req, res) {
-      return res.statusCode === 200;
-    },
-  })
-);
+// app.use(
+//   morgan("common", {
+//     stream: accessLogStream,
+//     skip: function (req, res) {
+//       return res.statusCode === 200;
+//     },
+//   })
+// );
 
 app.get("/", (req, res) => {
   return res.send("Hiiii!!!");
