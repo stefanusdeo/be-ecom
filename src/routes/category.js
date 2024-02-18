@@ -14,7 +14,7 @@ const {
 
 route.post("/", auth, insertCategories);
 
-route.get("/", auth, getCategories);
+route.get("/", getCategories);
 
 route.put("/", auth, updateCategories);
 

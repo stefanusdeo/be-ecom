@@ -3,7 +3,6 @@ const { v4: uuidv4 } = require("uuid");
 
 const getCategories = async (req, res, next) => {
   try {
-    console.log(req.query);
     const [rows] = await CategoryModel.getCategories(req.query);
 
     return res.json({

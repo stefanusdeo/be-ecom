@@ -1,25 +1,44 @@
 const express = require("express");
 const helmet = require("helmet");
+var fs = require("file-system");
 const morgan = require("morgan");
+const cors = require("cors");
 require("dotenv").config();
 
 // route
 const authRoute = require("./src/routes/auth");
 const categoryRoute = require("./src/routes/category");
+const subCategoryRoute = require("./src/routes/subCategory");
+const productRoute = require("./src/routes/product");
 
 // middleware
 const error = require("./src/middleware/error");
 
 const app = express();
 app.use(express.json());
+app.use(cors());
 app.use(helmet());
-app.use(morgan("tiny"));
+
+var accessLogStream = fs.createWriteStream("./access.log", { flags: "a" });
+
+// setup the logger
+app.use(
+  morgan("common", {
+    stream: accessLogStream,
+    skip: function (req, res) {
+      return res.statusCode === 200;
+    },
+  })
+);
+
 app.get("/", (req, res) => {
   return res.send("Hiiii!!!");
 });
 
 app.use("/api/login", authRoute);
 app.use("/api/category", categoryRoute);
+app.use("/api/sub-category", subCategoryRoute);
+app.use("/api/product", productRoute);
 
 app.use(error);
 
