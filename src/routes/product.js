@@ -31,6 +31,6 @@ const upload = multer({ storage: storage });
 
 route.get("/", getProducts);
 route.post("/", auth, upload.single("main_img"), insertProduct);
-route.get("/:id", getProductUuid);
+route.get("/:uuid", getProductUuid);
 
 module.exports = route;

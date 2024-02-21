@@ -2,33 +2,88 @@ const db = require("../config/connectDb");
 const createSlug = require("../config/createSlug");
 
 // get Product
-const getProducts = (body, page = 1, pageSize = 10) => {
-  let sqlQuery = "SELECT * FROM products WHERE status=1";
+const getProducts = async (body, page = 1, pageSize = 10) => {
+  let sqlQuery = `
+    SELECT 
+      p.*,
+      JSON_ARRAYAGG(
+        JSON_OBJECT('language', pl.language, 'information', pl.information, 'description', pl.description)
+      ) AS product_lang
+    FROM 
+      products p
+    LEFT JOIN 
+      product_lang pl ON p.id = pl.id_product
+    WHERE 
+      1
+  `;
+
   const params = [];
 
   if (body.uuid) {
-    sqlQuery += " AND uuid = ?";
+    sqlQuery += " AND p.uuid = ?";
     params.push(body.uuid);
   }
 
   if (body.name) {
-    sqlQuery += " AND name = ?";
+    sqlQuery += " AND p.name = ?";
     params.push(body.name);
   }
 
+  if (body.status) {
+    sqlQuery += " AND p.status = ?";
+    params.push(body.status);
+  }
+
   if (body.category_uuid) {
-    sqlQuery += " AND category_uuid = ?";
+    sqlQuery += " AND p.category_uuid = ?";
     params.push(body.category_uuid);
   }
+
+  sqlQuery += " GROUP BY p.id, p.name"; // Grupkan hasil berdasarkan UUID dan nama produk
 
   if (page && pageSize) {
     const offset = (page - 1) * pageSize;
     sqlQuery += " LIMIT ?, ?";
-    params.push(offset, pageSize);
+    params.push(`${offset}`, `${pageSize}`);
   }
 
-  const data = db.execute(sqlQuery, params);
-  return data;
+  const product = await db.execute(sqlQuery, params);
+
+  // Query untuk menghitung total data
+  let countQuery = `
+      SELECT COUNT(*) AS total_data
+      FROM products p
+      WHERE 1
+    `;
+
+  let paramsCount = [];
+
+  if (body.uuid) {
+    countQuery += " AND p.uuid = ?";
+    paramsCount.push(body.uuid);
+  }
+
+  if (body.name) {
+    countQuery += " AND p.name = ?";
+    paramsCount.push(body.name);
+  }
+
+  if (body.status) {
+    countQuery += " AND p.status = ?";
+    paramsCount.push(body.status);
+  }
+
+  if (body.category_uuid) {
+    countQuery += " AND p.category_uuid = ?";
+    paramsCount.push(body.category_uuid);
+  }
+
+  // Eksekusi query untuk menghitung total data
+  const respCount = await db.execute(countQuery, paramsCount);
+  return {
+    pagination: respCount,
+    data: product,
+  };
 };
 
 const getProductUuid = (body) => {
@@ -36,6 +91,7 @@ const getProductUuid = (body) => {
   const params = [body.uuid];
 
   const data = db.execute(sqlQuery, params);
+
   return data;
 };
 

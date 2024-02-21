@@ -14,6 +14,8 @@ const getCategories = (body) => {
     sqlQuery += " AND name = ?";
     params.push(body.name);
   }
+
+  console.log(params);
   const data = db.execute(sqlQuery, params);
   return data;
 };

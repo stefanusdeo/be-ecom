@@ -14,11 +14,20 @@ const getProducts = async (req, res, next) => {
   try {
     const page = req.query?.page || 1;
     const pageSize = req.query?.page || 10;
-    const [rows] = await ProductModel.getProducts(req.query, page, pageSize);
+    const resp = await ProductModel.getProducts(req.query, page, pageSize);
+    const [rows] = resp.data;
+    const [totalData] = resp.pagination;
+    const pagination = {
+      page,
+      pageSize,
+      totalData: totalData[0].total_data,
+      totalPage: Math.ceil(parseInt(totalData[0].total_data || 0) / pageSize),
+    };
 
     return res.json({
       message: "Success Get Data",
       data: rows,
+      pagination: pagination,
     });
   } catch (error) {
     next(error);
@@ -27,10 +36,7 @@ const getProducts = async (req, res, next) => {
 
 const getProductUuid = async (req, res, next) => {
   try {
-    const payload = {
-      uuid: req.param.uuid,
-    };
-    const [rows] = await ProductModel.getProductUuid(payload);
+    const [rows] = await ProductModel.getProductUuid(req.query);
     return res.json({
       message: "Success Get Data",
       data: rows,
