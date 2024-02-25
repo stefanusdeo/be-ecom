@@ -3,12 +3,6 @@ const ProductModel = require("../model/Product");
 const CategoryModel = require("../model/Category");
 const SubCategoryModel = require("../model/SubCategory");
 const ProductLangModel = require("../model/ProductLang");
-const {
-  getConnection,
-  beginTransaction,
-  commitTransaction,
-  rollbackTransaction,
-} = require("../config/transactionDb");
 
 const getProducts = async (req, res, next) => {
   try {
@@ -26,7 +20,7 @@ const getProducts = async (req, res, next) => {
 
     return res.json({
       message: "Success Get Data",
-      data: rows,
+      data: rows.length > 0 ? [] : rows,
       pagination: pagination,
     });
   } catch (error) {
@@ -57,6 +51,7 @@ const insertProduct = async (req, res, next) => {
     price_eur,
     language,
   } = req.body;
+  console.log(req.main_img);
   const main_img = req.file.filename;
 
   //checking

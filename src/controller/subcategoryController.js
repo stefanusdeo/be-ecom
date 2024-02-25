@@ -68,7 +68,7 @@ const insertSubCategory = async (req, res, next) => {
 
 const updateSubCategory = async (req, res, next) => {
   try {
-    const { name, uuid_category } = req.body;
+    const { name, uuid_category, id } = req.body;
 
     //check
     const payloadCategory = {
@@ -80,21 +80,13 @@ const updateSubCategory = async (req, res, next) => {
         message: "Category Not Found!",
       });
     }
-    const payloadCheck = {
+
+    const payloadUpdate = {
+      id,
       name,
+      uuid_category,
     };
-    let [rows] = await SubCategory.getSubCategory(payloadCheck);
-    if (rows.length > 0) {
-      return res.status(400).json({ message: "Name Already Exists!" });
-    }
-
-    if (name.length <= 2) {
-      return res.status(400).json({
-        message: "Name min 3 characters",
-      });
-    }
-
-    await SubCategory.updateSubCategory(req.body);
+    await SubCategory.updateSubCategory(payloadUpdate);
 
     const data = {
       uuid_category,
@@ -111,7 +103,7 @@ const updateSubCategory = async (req, res, next) => {
 
 const deleteSubCategory = async (req, res, next) => {
   try {
-    const { id } = req.query;
+    const { id } = req.body;
 
     const payloadSearch = {
       id,
@@ -121,9 +113,11 @@ const deleteSubCategory = async (req, res, next) => {
       return res.status(404).json({ message: "Data Not Found" });
     }
 
-    const response = await SubCategory.deleteSubCategory(rows[0]);
+    const [response] = await SubCategory.deleteSubCategory(rows[0]);
     if (response.affectedRows > 0)
       return res.status(200).json({ message: "Data Deleted" });
+
+    return res.status(400).json({ message: "Failed Delete" });
   } catch (error) {
     next(error);
   }

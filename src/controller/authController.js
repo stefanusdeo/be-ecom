@@ -25,14 +25,13 @@ const login = async (req, res, next) => {
         return res.json({
           success: true,
           message: "Login successful",
-          user: user,
+          user: payloadUser,
           accessToken,
         });
       } else {
         return res.status(401).json({
           success: false,
           message: "Invalid username or password 1",
-          data: rows,
         });
       }
     } else {

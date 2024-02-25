@@ -10,6 +10,7 @@ const authRoute = require("./src/routes/auth");
 const categoryRoute = require("./src/routes/category");
 const subCategoryRoute = require("./src/routes/subCategory");
 const productRoute = require("./src/routes/product");
+const orderRoute = require("./src/routes/order");
 
 // middleware
 const error = require("./src/middleware/error");
@@ -34,11 +35,12 @@ app.use(helmet());
 app.get("/", (req, res) => {
   return res.send("Hiiii!!!, v1.1");
 });
-
+app.use("/images", express.static("uploads/"));
 app.use("/api/login", authRoute);
 app.use("/api/category", categoryRoute);
 app.use("/api/sub-category", subCategoryRoute);
 app.use("/api/product", productRoute);
+app.use("/api/order", orderRoute);
 
 app.use(error);
 

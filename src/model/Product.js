@@ -1,6 +1,21 @@
 const db = require("../config/connectDb");
 const createSlug = require("../config/createSlug");
 
+const getProductWithoutLang = async (body) => {
+  const sqlQuery = `SELECT * FROM products WHERE 1`;
+  const params = [];
+
+  if (body.id) {
+    sqlQuery += " AND p.id = ?";
+    params.push(body.id);
+  }
+  if (body.uuid) {
+    sqlQuery += " AND p.uuid = ?";
+    params.push(body.uuid);
+  }
+
+  return (product = await db.execute(sqlQuery, params));
+};
 // get Product
 const getProducts = async (body, page = 1, pageSize = 10) => {
   let sqlQuery = `
@@ -127,4 +142,5 @@ module.exports = {
   getProducts,
   getProductUuid,
   insertProduct,
+  getProductWithoutLang,
 };
