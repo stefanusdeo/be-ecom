@@ -1,6 +1,6 @@
 const db = require("../config/connectDb");
 
-const getOrdersWithotChild = async (body) => {
+const getOrdersWithotChild = async (body, connection) => {
   let sqlQuery = `SELECT * FROM orders WHERE 1`;
   let params = [];
   if (body.id) {
@@ -13,7 +13,7 @@ const getOrdersWithotChild = async (body) => {
     params.push(body.uuid);
   }
 
-  const data = await db.execute(sqlQuery, params);
+  const data = await connection.execute(sqlQuery, params);
   return data;
 };
 // get Categories
@@ -66,7 +66,12 @@ const getOrders = async (body) => {
     params.push(body.status);
   }
 
+  const offset = (parseInt(body.page) - 1) * parseInt(body.pageSize);
+
+  // Menambahkan LIMIT dan OFFSET ke query SQL
+  sqlQuery += ` LIMIT ${parseInt(body.pageSize)} OFFSET ${offset}`;
   const products = await db.execute(sqlQuery, params);
+
   let countQuery = `
       SELECT COUNT(*) AS total_data
       FROM orders

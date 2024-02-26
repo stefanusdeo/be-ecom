@@ -50,8 +50,8 @@ const insertProduct = async (req, res, next) => {
     price_chf,
     price_eur,
     language,
+    is_custom,
   } = req.body;
-  console.log(req.main_img);
   const main_img = req.file.filename;
 
   //checking
@@ -89,6 +89,7 @@ const insertProduct = async (req, res, next) => {
       price_dolar,
       price_chf,
       price_eur,
+      is_custom,
     };
     const [product] = await ProductModel.insertProduct(payload, connection);
     const id_product = product.insertId;
@@ -101,7 +102,7 @@ const insertProduct = async (req, res, next) => {
         information: lang.information,
         language: lang.language,
       };
-
+      console.log(payloadProLang);
       await ProductLangModel.insertProductLang(payloadProLang, connection);
     }
 
@@ -118,8 +119,31 @@ const insertProduct = async (req, res, next) => {
   }
 };
 
+const deleteProduct = async (req, res, next) => {
+  try {
+    const { uuid } = req.body;
+    const connection = db.getConnection();
+    const payloadSearch = {
+      uuid,
+    };
+    const [rows] = await ProductModel.getProductWithoutLang(payloadSearch);
+    if (rows.length === 0) {
+      return res.status(404).json({ message: "Data Not Found" });
+    }
+
+    const [response] = await ProductModel.deleteProduct(rows[0], connection);
+    if (response.affectedRows > 0)
+      return res.status(200).json({ message: "Data Deleted" });
+
+    return res.status(400).json({ message: "Failed Delete" });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   getProducts,
   getProductUuid,
   insertProduct,
+  deleteProduct,
 };

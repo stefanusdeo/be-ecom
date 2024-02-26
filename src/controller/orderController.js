@@ -7,8 +7,13 @@ const db = require("../config/connectDb");
 const getOrders = async (req, res, next) => {
   try {
     const page = req.query?.page || 1;
-    const pageSize = req.query?.page || 10;
-    const resp = await OrderModel.getOrders(req.query);
+    const pageSize = req.query?.pageSize || 10;
+    const payloadGetData = {
+      ...req.query,
+      page,
+      pageSize,
+    };
+    const resp = await OrderModel.getOrders(payloadGetData);
     const [rows] = resp.data;
     const [totalData] = resp.pagination;
     const pagination = {
@@ -19,7 +24,7 @@ const getOrders = async (req, res, next) => {
     };
     return res.json({
       message: "Success Get Data",
-      data: rows.length > 0 ? [] : rows,
+      data: rows.length > 0 ? rows : [],
       pagination,
     });
   } catch (error) {
@@ -61,14 +66,16 @@ const insertOrder = async (req, res, next) => {
     const payloadGetOrder = {
       id: orderId,
     };
-    const [respOrder] = await OrderModel.getOrdersWithotChild(payloadGetOrder);
-    console.log(respOrder);
+    const [respOrder] = await OrderModel.getOrdersWithotChild(
+      payloadGetOrder,
+      connection
+    );
     const dataOrder = respOrder[0];
     for (const product of products) {
       const payload = {
         id: product.id,
       };
-      const [rows] = await ProductModel.getProductWithoutLang(payload);
+      let [rows] = await ProductModel.getProductWithoutLang(payload);
       if (rows.length !== 1) throw new Error("Product Not Found!");
 
       let payloadOrderItems = {
@@ -76,12 +83,15 @@ const insertOrder = async (req, res, next) => {
         uuid_order: dataOrder.uuid,
         id_product: rows[0].id,
         qty: product.qty,
-        price_per_page:
+        price_per_product:
           currency === "DOLAR" ? rows[0].price_dolar : rows[0].price_chf,
         currentDate: new Date().toISOString().slice(0, 19).replace("T", " "),
       };
-      console.log(payloadOrderItems);
-      await OrderItemsModel.insertOrderItems(payloadOrderItems, connection);
+      const respOi = await OrderItemsModel.insertOrderItems(
+        payloadOrderItems,
+        connection
+      );
+      console.log(respOi);
     }
 
     await connection.commit();
@@ -91,6 +101,8 @@ const insertOrder = async (req, res, next) => {
   } catch (error) {
     await connection.rollback();
     next(error);
+  } finally {
+    await connection.release();
   }
 };
 
@@ -99,7 +111,7 @@ const updateStatusOrder = async (req, res, next) => {
   try {
     await connection.beginTransaction();
     const { uuid, status } = req.body;
-    const [data] = await OrderModel.getOrdersWithotChild({ uuid });
+    const [data] = await OrderModel.getOrdersWithotChild({ uuid }, connection);
 
     let dataOrder = data[0];
     let payloadOrder = {

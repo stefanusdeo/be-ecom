@@ -2,19 +2,19 @@ const db = require("../config/connectDb");
 const createSlug = require("../config/createSlug");
 
 const getProductWithoutLang = async (body) => {
-  const sqlQuery = `SELECT * FROM products WHERE 1`;
+  let sqlQuery = `SELECT * FROM products WHERE 1`;
   const params = [];
 
   if (body.id) {
-    sqlQuery += " AND p.id = ?";
+    sqlQuery += " AND id = ?";
     params.push(body.id);
   }
   if (body.uuid) {
-    sqlQuery += " AND p.uuid = ?";
+    sqlQuery += " AND uuid = ?";
     params.push(body.uuid);
   }
 
-  return (product = await db.execute(sqlQuery, params));
+  return await db.execute(sqlQuery, params);
 };
 // get Product
 const getProducts = async (body, page = 1, pageSize = 10) => {
@@ -120,11 +120,12 @@ const insertProduct = (body, connection) => {
     price_dolar,
     price_chf,
     price_eur,
+    is_custom,
   } = body;
   const slug = createSlug(name);
-
-  const sqlQuery =
-    "INSERT INTO products (category_uuid, slug_sub_category, name, slug, main_img, size, price_dolar, price_chf, price_eur) VALUES (?,?, ?, ?, ?, ?, ?, ?, ?)";
+  const status = 1;
+  const sqlQuery = `INSERT INTO products (category_uuid, slug_sub_category, name, slug, main_img, size, price_dolar, price_chf, price_eur, status, is_custom) 
+  VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
   return connection.execute(sqlQuery, [
     uuid_category,
     slug_sub_category,
@@ -135,7 +136,28 @@ const insertProduct = (body, connection) => {
     price_dolar,
     price_chf,
     price_eur,
+    status,
+    parseInt(is_custom),
   ]);
+};
+
+const deleteProduct = (body, connection) => {
+  const {
+    uuid,
+    uuid_category,
+    slug_sub_category,
+    name,
+    main_img,
+    size,
+    price_dolar,
+    price_chf,
+    price_eur,
+    is_custom,
+  } = body;
+  const slug = createSlug(name);
+
+  const sqlQuery = `UPDATE products SET uuid_category='${uuid_category}', slug_sub_category='${slug_sub_category}', name='${name}', slug='${slug}', main_img='${main_img}', size='${size}', price_dolar='${price_dolar}', price_chf='${price_chf}', price_eur='${price_eur}', is_custom='${is_custom}', status='0' WHERE uuid='${uuid}'`;
+  return connection.execute(sqlQuery);
 };
 
 module.exports = {
@@ -143,4 +165,5 @@ module.exports = {
   getProductUuid,
   insertProduct,
   getProductWithoutLang,
+  deleteProduct,
 };
