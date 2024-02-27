@@ -9,9 +9,19 @@ const getProductWithoutLang = async (body) => {
     sqlQuery += " AND id = ?";
     params.push(body.id);
   }
-  if (body.uuid) {
-    sqlQuery += " AND uuid = ?";
-    params.push(body.uuid);
+  if (body.slug) {
+    sqlQuery += " AND slug = ?";
+    params.push(body.slug);
+  }
+
+  if (body.slug_sub_category) {
+    sqlQuery += " AND slug_sub_category = ?";
+    params.push(body.slug_sub_category);
+  }
+
+  if (body.category_uuid) {
+    sqlQuery += " AND category_uuid = ?";
+    params.push(body.category_uuid);
   }
 
   return await db.execute(sqlQuery, params);
@@ -33,10 +43,19 @@ const getProducts = async (body, page = 1, pageSize = 10) => {
   `;
 
   const params = [];
+  if (body.id) {
+    sqlQuery += " AND p.id = ?";
+    params.push(body.id);
+  }
 
-  if (body.uuid) {
-    sqlQuery += " AND p.uuid = ?";
-    params.push(body.uuid);
+  if (body.slug_sub_category) {
+    sqlQuery += " AND p.slug_sub_category = ?";
+    params.push(body.slug_sub_category);
+  }
+
+  if (body.slug) {
+    sqlQuery += " AND p.slug = ?";
+    params.push(body.slug);
   }
 
   if (body.name) {
@@ -73,9 +92,18 @@ const getProducts = async (body, page = 1, pageSize = 10) => {
 
   let paramsCount = [];
 
-  if (body.uuid) {
-    countQuery += " AND p.uuid = ?";
-    paramsCount.push(body.uuid);
+  if (body.id) {
+    countQuery += " AND p.id = ?";
+    paramsCount.push(body.id);
+  }
+  if (body.slug) {
+    countQuery += " AND p.slug = ?";
+    paramsCount.push(body.slug);
+  }
+
+  if (body.slug_sub_category) {
+    countQuery += " AND p.slug_sub_category = ?";
+    paramsCount.push(body.slug_sub_category);
   }
 
   if (body.name) {
@@ -143,8 +171,9 @@ const insertProduct = (body, connection) => {
 
 const deleteProduct = (body, connection) => {
   const {
+    id,
     uuid,
-    uuid_category,
+    category_uuid,
     slug_sub_category,
     name,
     main_img,
@@ -156,7 +185,7 @@ const deleteProduct = (body, connection) => {
   } = body;
   const slug = createSlug(name);
 
-  const sqlQuery = `UPDATE products SET uuid_category='${uuid_category}', slug_sub_category='${slug_sub_category}', name='${name}', slug='${slug}', main_img='${main_img}', size='${size}', price_dolar='${price_dolar}', price_chf='${price_chf}', price_eur='${price_eur}', is_custom='${is_custom}', status='0' WHERE uuid='${uuid}'`;
+  const sqlQuery = `UPDATE products SET slug='${slug}', category_uuid='${category_uuid}', slug_sub_category='${slug_sub_category}', name='${name}', slug='${slug}', main_img='${main_img}', size='${size}', price_dolar='${price_dolar}', price_chf='${price_chf}', price_eur='${price_eur}', is_custom='${is_custom}', status='0' WHERE id='${id}'`;
   return connection.execute(sqlQuery);
 };
 

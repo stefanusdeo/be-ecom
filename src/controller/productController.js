@@ -3,11 +3,12 @@ const ProductModel = require("../model/Product");
 const CategoryModel = require("../model/Category");
 const SubCategoryModel = require("../model/SubCategory");
 const ProductLangModel = require("../model/ProductLang");
+const createSlug = require("../config/createSlug");
 
 const getProducts = async (req, res, next) => {
   try {
     const page = req.query?.page || 1;
-    const pageSize = req.query?.page || 10;
+    const pageSize = req.query?.pageSize || 10;
     const resp = await ProductModel.getProducts(req.query, page, pageSize);
     const [rows] = resp.data;
     const [totalData] = resp.pagination;
@@ -20,7 +21,7 @@ const getProducts = async (req, res, next) => {
 
     return res.json({
       message: "Success Get Data",
-      data: rows.length > 0 ? [] : rows,
+      data: rows.length > 0 ? rows : [],
       pagination: pagination,
     });
   } catch (error) {
@@ -60,6 +61,13 @@ const insertProduct = async (req, res, next) => {
   });
   if (getCategory.length === 0)
     return res.status(404).json({ message: "Category Not Found" });
+
+  const [getProducts] = await ProductModel.getProductWithoutLang({
+    slug: createSlug(name),
+    slug_sub_category,
+  });
+  if (getProducts.length === 0)
+    return res.status(404).json({ message: "Product Name Already Exists" });
 
   const [subCategoryData] = await SubCategoryModel.getSubCategory({
     slug: slug_sub_category,
@@ -121,10 +129,10 @@ const insertProduct = async (req, res, next) => {
 
 const deleteProduct = async (req, res, next) => {
   try {
-    const { uuid } = req.body;
-    const connection = db.getConnection();
+    const { id } = req.body;
+    const connection = await db.getConnection();
     const payloadSearch = {
-      uuid,
+      id,
     };
     const [rows] = await ProductModel.getProductWithoutLang(payloadSearch);
     if (rows.length === 0) {

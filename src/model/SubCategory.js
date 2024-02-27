@@ -6,9 +6,14 @@ const getSubCategory = (body) => {
   let sqlQuery = "SELECT * FROM sub_category WHERE status=1";
   const params = [];
 
-  if (body.uuid_category) {
+  if (body.category_uuid) {
     sqlQuery += " AND uuid_category = ?";
-    params.push(body.uuid_category);
+    params.push(body.category_uuid);
+  }
+
+  if (body.id) {
+    sqlQuery += " AND id = ?";
+    params.push(body.id);
   }
 
   if (body.slug) {

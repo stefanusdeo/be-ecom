@@ -11,6 +11,7 @@ const {
   getProducts,
   getProductUuid,
   insertProduct,
+  deleteProduct,
 } = require("../controller/productController");
 
 // Konfigurasi multer untuk unggah gambar
@@ -32,5 +33,6 @@ const upload = multer({ storage: storage });
 route.get("/", getProducts);
 route.post("/", auth, upload.single("main_img"), insertProduct);
 route.get("/:uuid", getProductUuid);
+route.delete("/", deleteProduct);
 
 module.exports = route;

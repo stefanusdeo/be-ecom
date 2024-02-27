@@ -11,11 +11,13 @@ const categoryRoute = require("./src/routes/category");
 const subCategoryRoute = require("./src/routes/subCategory");
 const productRoute = require("./src/routes/product");
 const orderRoute = require("./src/routes/order");
+const aboutUsRoute = require("./src/routes/aboutus");
 
 // middleware
 const error = require("./src/middleware/error");
 
 const app = express();
+app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cors());
 app.use(helmet());
@@ -39,6 +41,7 @@ app.use("/images", express.static("uploads/"));
 app.use("/api/login", authRoute);
 app.use("/api/category", categoryRoute);
 app.use("/api/sub-category", subCategoryRoute);
+app.use("/api/about-us", aboutUsRoute);
 app.use("/api/product", productRoute);
 app.use("/api/order", orderRoute);
 
