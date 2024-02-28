@@ -10,6 +10,13 @@ const insertProductLang = (body, connection) => {
   return connection.execute(query, values);
 };
 
+const deleteProductLangWithIdProduct = async (id, connection) => {
+  const deleteQuery = "DELETE FROM product_lang WHERE id_product = ?";
+  const result = await connection.execute(deleteQuery, [id]);
+  return result;
+};
+
 module.exports = {
   insertProductLang,
+  deleteProductLangWithIdProduct,
 };

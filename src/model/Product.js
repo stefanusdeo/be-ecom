@@ -169,6 +169,24 @@ const insertProduct = (body, connection) => {
   ]);
 };
 
+const updateProduct = (body, connection) => {
+  const {
+    uuid_category,
+    slug_sub_category,
+    name,
+    main_img,
+    size,
+    price_dolar,
+    price_chf,
+    price_eur,
+    is_custom,
+    id,
+  } = body;
+  const slug = createSlug(name);
+  const sqlQuery = `UPDATE products SET category_uuid='${uuid_category}', slug_sub_category='${slug_sub_category}', name='${name}', slug='${slug}', main_img='${main_img}', size='${size}', price_dolar='${price_dolar}', price_chf='${price_chf}', price_eur='${price_eur}', is_custom='${is_custom}' WHERE id=${id}`;
+  return connection.execute(sqlQuery);
+};
+
 const deleteProduct = (body, connection) => {
   const {
     id,
@@ -195,4 +213,5 @@ module.exports = {
   insertProduct,
   getProductWithoutLang,
   deleteProduct,
+  updateProduct,
 };

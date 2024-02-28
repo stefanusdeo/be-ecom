@@ -127,6 +127,105 @@ const insertProduct = async (req, res, next) => {
   }
 };
 
+const updateProduct = async (req, res, next) => {
+  const {
+    uuid_category,
+    slug_sub_category,
+    name,
+    size,
+    price_dolar,
+    price_chf,
+    price_eur,
+    language,
+    is_custom,
+    id,
+  } = req.body;
+
+  if (!uuid_category)
+    return res.status(400).json({ message: "Category Required" });
+  if (!slug_sub_category)
+    return res.status(400).json({ message: "SubCategory Required" });
+
+  const [getProducts] = await ProductModel.getProductWithoutLang({
+    id,
+  });
+
+  if (getProducts.length !== 1)
+    return res.status(404).json({ message: "Product Not found" });
+
+  const main_img = req.file ? req.file.filename : getProducts[0].main_img;
+
+  //checking
+  const [getCategory] = await CategoryModel.getCategories({
+    uuid: uuid_category,
+  });
+  if (getCategory.length === 0)
+    return res.status(404).json({ message: "Category Not Found" });
+
+  const [subCategoryData] = await SubCategoryModel.getSubCategory({
+    slug: slug_sub_category,
+  });
+  if (subCategoryData.length === 0)
+    return res.status(404).json({ message: "SubCategory Not Found" });
+
+  if (name.length < 3)
+    return res.status(400).json({ message: "Name min 4 Characters" });
+
+  if (!size) return res.status(400).json({ message: "Size Required" });
+
+  if (!price_chf || !price_dolar || !price_eur)
+    return res.status(400).json({ message: "Price Required" });
+
+  const connection = await db.getConnection();
+
+  try {
+    await connection.beginTransaction();
+
+    const payload = {
+      uuid_category,
+      main_img,
+      slug_sub_category,
+      name,
+      size,
+      price_dolar,
+      price_chf,
+      price_eur,
+      is_custom,
+      id,
+    };
+    const [product] = await ProductModel.updateProduct(payload, connection);
+    const id_product = product.insertId;
+
+    const respDel = await ProductLangModel.deleteProductLangWithIdProduct(
+      id_product,
+      connection
+    );
+    if (respDel.affectedRows < 1) throw new Error("Failed Delete Product Lang");
+
+    const bahasa = JSON.parse(language);
+    for (const lang of bahasa) {
+      const payloadProLang = {
+        id_product,
+        description: lang.description,
+        information: lang.information,
+        language: lang.language,
+      };
+      await ProductLangModel.insertProductLang(payloadProLang, connection);
+    }
+
+    await connection.commit();
+
+    return res.json({
+      message: "Success Edit Product",
+    });
+  } catch (error) {
+    await connection.rollback();
+    next(error);
+  } finally {
+    connection.release();
+  }
+};
+
 const deleteProduct = async (req, res, next) => {
   try {
     const { id } = req.body;
@@ -154,4 +253,5 @@ module.exports = {
   getProductUuid,
   insertProduct,
   deleteProduct,
+  updateProduct,
 };
