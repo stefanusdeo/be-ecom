@@ -138,7 +138,7 @@ const getProductUuid = (body) => {
   return data;
 };
 
-const insertProduct = (body, connection) => {
+const insertProduct = async (body, connection) => {
   const {
     uuid_category,
     slug_sub_category,
@@ -150,7 +150,7 @@ const insertProduct = (body, connection) => {
     price_eur,
     is_custom,
   } = body;
-  const slug = createSlug(name);
+  const slug = await createSlug(name);
   const status = 1;
   const sqlQuery = `INSERT INTO products (category_uuid, slug_sub_category, name, slug, main_img, size, price_dolar, price_chf, price_eur, status, is_custom) 
   VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;

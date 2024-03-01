@@ -52,8 +52,8 @@ const insertProduct = async (req, res, next) => {
     price_eur,
     language,
     is_custom,
+    main_img,
   } = req.body;
-  const main_img = req.file.filename;
 
   //checking
   const [getCategory] = await CategoryModel.getCategories({
@@ -66,7 +66,7 @@ const insertProduct = async (req, res, next) => {
     slug: createSlug(name),
     slug_sub_category,
   });
-  if (getProducts.length === 0)
+  if (getProducts.length === 1)
     return res.status(404).json({ message: "Product Name Already Exists" });
 
   const [subCategoryData] = await SubCategoryModel.getSubCategory({
@@ -90,7 +90,6 @@ const insertProduct = async (req, res, next) => {
 
     const payload = {
       uuid_category,
-      main_img,
       slug_sub_category,
       name,
       size,
@@ -98,11 +97,13 @@ const insertProduct = async (req, res, next) => {
       price_chf,
       price_eur,
       is_custom,
+      main_img,
     };
     const [product] = await ProductModel.insertProduct(payload, connection);
     const id_product = product.insertId;
 
-    const bahasa = JSON.parse(language);
+    const bahasa =
+      typeof language === "string" ? JSON.parse(language) : language;
     for (const lang of bahasa) {
       const payloadProLang = {
         id_product,
@@ -110,7 +111,6 @@ const insertProduct = async (req, res, next) => {
         information: lang.information,
         language: lang.language,
       };
-      console.log(payloadProLang);
       await ProductLangModel.insertProductLang(payloadProLang, connection);
     }
 
@@ -139,6 +139,7 @@ const updateProduct = async (req, res, next) => {
     language,
     is_custom,
     id,
+    main_img,
   } = req.body;
 
   if (!uuid_category)
@@ -152,8 +153,6 @@ const updateProduct = async (req, res, next) => {
 
   if (getProducts.length !== 1)
     return res.status(404).json({ message: "Product Not found" });
-
-  const main_img = req.file ? req.file.filename : getProducts[0].main_img;
 
   //checking
   const [getCategory] = await CategoryModel.getCategories({
@@ -202,7 +201,8 @@ const updateProduct = async (req, res, next) => {
     );
     if (respDel.affectedRows < 1) throw new Error("Failed Delete Product Lang");
 
-    const bahasa = JSON.parse(language);
+    const bahasa =
+      typeof language === "string" ? JSON.parse(language) : language;
     for (const lang of bahasa) {
       const payloadProLang = {
         id_product,

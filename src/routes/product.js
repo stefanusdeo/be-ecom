@@ -16,24 +16,10 @@ const {
 } = require("../controller/productController");
 
 // Konfigurasi multer untuk unggah gambar
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, "uploads/"); // Direktori untuk menyimpan file yang diunggah
-  },
-  filename: function (req, file, cb) {
-    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
-    cb(
-      null,
-      file.fieldname + "-" + uniqueSuffix + path.extname(file.originalname)
-    );
-  },
-});
-
-const upload = multer({ storage: storage });
 
 route.get("/", getProducts);
-route.post("/", auth, upload.single("main_img"), insertProduct);
-route.put("/", auth, upload.single("main_img"), updateProduct);
+route.post("/", auth, insertProduct);
+route.put("/", auth, updateProduct);
 route.get("/:uuid", getProductUuid);
 route.delete("/", deleteProduct);
 
