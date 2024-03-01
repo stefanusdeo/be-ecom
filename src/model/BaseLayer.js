@@ -38,14 +38,8 @@ const insertBaseLayer = (body) => {
 
 const updateBaseLayer = (body) => {
   const { id_product, layers, id } = body;
-  let data = "";
-  if (typeof layers === "string") {
-    data = layers;
-  } else {
-    data = JSON.stringify(layers);
-  }
   // Query untuk menyimpan data kategori baru
-  const query = `UPDATE baselayers SET layers='${data}', id_product='${id_product}' WHERE id='${id}'`;
+  const query = `UPDATE baselayers SET layers='${layers}', id_product='${id_product}' WHERE id='${id}'`;
   return db.execute(query);
 };
 

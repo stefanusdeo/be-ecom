@@ -1,5 +1,5 @@
 const BaseLayerModel = require("../model/BaseLayer");
-const { v4: uuidv4 } = require("uuid");
+const ProductModel = require("../model/Product");
 
 const getBaseLayers = async (req, res, next) => {
   try {
@@ -18,35 +18,26 @@ const getBaseLayers = async (req, res, next) => {
 
 const insertBaseLayers = async (req, res, next) => {
   try {
-    const { name } = req.body;
+    const { id_product, layers } = req.body;
+    if (!id_product) {
+      return res.status(404).json({ message: "Product Not Found" });
+    }
 
-    // Generate UUID
-    const uuid = uuidv4();
-
-    // Waktu sekarang
-    const currentDate = new Date().toISOString().slice(0, 19).replace("T", " ");
-
-    if (name.length <= 2) {
-      return res.status(400).json({
-        message: "Name min 3 characters",
-      });
+    const [rows] = await ProductModel.getProductWithoutLang({ id: id_product });
+    if (rows.length !== 1) {
+      return res.status(404).json({ message: "product Not found" });
     }
 
     const payloadInsert = {
-      uuid,
-      name,
-      currentDate,
+      id_product,
+      layers,
     };
 
-    await BaseLayerModel.insertCategories(payloadInsert);
+    await BaseLayerModel.insertBaseLayer(payloadInsert);
 
-    const payloadSearch = {
-      uuid,
-    };
-    const [rows] = await BaseLayerModel.getBaseLayer(payloadSearch);
     return res.json({
       message: "Success Add Data",
-      data: rows,
+      data: payloadInsert,
     });
   } catch (error) {
     next(error);
@@ -55,23 +46,23 @@ const insertBaseLayers = async (req, res, next) => {
 
 const updateBaseLayer = async (req, res, next) => {
   try {
-    const { name, uuid } = req.body;
+    const { id_product } = req.body;
 
-    if (name.length <= 2) {
-      return res.status(400).json({
-        message: "Name min 3 characters",
-      });
+    if (!id_product) {
+      return res.status(404).json({ message: "Product Not Found" });
+    }
+
+    const [products] = await ProductModel.getProductWithoutLang({
+      id: id_product,
+    });
+    if (products.length !== 1) {
+      return res.status(404).json({ message: "product Not found" });
     }
 
     await BaseLayerModel.updateBaseLayer(req.body);
 
-    const payload = {
-      uuid,
-    };
-    const [rows] = await BaseLayerModel.getBaseLayer(payload);
     return res.json({
       message: "Success Update Data",
-      data: rows,
     });
   } catch (error) {
     next(error);
