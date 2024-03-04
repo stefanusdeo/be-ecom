@@ -12,6 +12,8 @@ const subCategoryRoute = require("./src/routes/subCategory");
 const productRoute = require("./src/routes/product");
 const orderRoute = require("./src/routes/order");
 const aboutUsRoute = require("./src/routes/aboutus");
+const baselayerRoute = require("./src/routes/baselayers");
+const productImgRoute = require("./src/routes/productImg");
 
 // middleware
 const error = require("./src/middleware/error");
@@ -36,7 +38,7 @@ app.use(helmet());
 // );
 
 app.get("/", (req, res) => {
-  return res.send("Hiiii!!!, v1.3");
+  return res.send("Hiiii!!!, v1.4");
 });
 app.use("/images", express.static("uploads/"));
 app.use("/api/login", authRoute);
@@ -44,7 +46,9 @@ app.use("/api/category", categoryRoute);
 app.use("/api/sub-category", subCategoryRoute);
 app.use("/api/about-us", aboutUsRoute);
 app.use("/api/product", productRoute);
+app.use("/api/product-img", productImgRoute);
 app.use("/api/order", orderRoute);
+app.use("/api/baselayer", baselayerRoute);
 
 app.use(error);
 

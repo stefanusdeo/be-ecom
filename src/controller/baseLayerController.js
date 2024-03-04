@@ -3,13 +3,21 @@ const ProductModel = require("../model/Product");
 
 const getBaseLayers = async (req, res, next) => {
   try {
-    if (!req.query.id_product)
-      return res.status(400).json({ message: "id product required" });
-    const [rows] = await BaseLayerModel.getBaseLayer(req.query);
+    const resp = await BaseLayerModel.getBaseLayer(req.query);
+    const layers = resp.data[0];
+    const pagination = resp.pagination[0][0];
+    const pageSize = req?.query?.pageSize || 10;
+    const paginationData = {
+      page: req?.query?.page || 1,
+      pageSize,
+      totalData: pagination.total_data,
+      totalPage: Math.ceil(parseInt(pagination.total_data || 0) / pageSize),
+    };
 
     return res.json({
       message: "Success Get Data",
-      data: rows,
+      data: layers,
+      pagination: paginationData,
     });
   } catch (error) {
     next(error);
@@ -18,9 +26,20 @@ const getBaseLayers = async (req, res, next) => {
 
 const insertBaseLayers = async (req, res, next) => {
   try {
-    const { id_product, layers } = req.body;
+    const { id_product, layers, number } = req.body;
     if (!id_product) {
       return res.status(404).json({ message: "Product Not Found" });
+    }
+
+    const respLayers = await BaseLayerModel.getBaseLayer({
+      id_product,
+      number,
+    });
+    const listLayers = respLayers.data[0];
+    if (listLayers.length > 0) {
+      return res
+        .status(404)
+        .json({ message: `layer number ${number} already exists` });
     }
 
     const [rows] = await ProductModel.getProductWithoutLang({ id: id_product });
@@ -31,6 +50,7 @@ const insertBaseLayers = async (req, res, next) => {
     const payloadInsert = {
       id_product,
       layers,
+      number,
     };
 
     await BaseLayerModel.insertBaseLayer(payloadInsert);
@@ -46,7 +66,7 @@ const insertBaseLayers = async (req, res, next) => {
 
 const updateBaseLayer = async (req, res, next) => {
   try {
-    const { id_product } = req.body;
+    const { id_product, id } = req.body;
 
     if (!id_product) {
       return res.status(404).json({ message: "Product Not Found" });
@@ -71,23 +91,21 @@ const updateBaseLayer = async (req, res, next) => {
 
 const deleteBaseLayer = async (req, res, next) => {
   try {
-    const { id_product } = req.body;
-    if (!req.body.id_product)
+    const { id } = req.body;
+    if (!req.body.id)
       return res.status(400).json({ message: "id product required" });
 
     const payloadSearch = {
-      id_product,
+      id,
     };
-    const [rows] = await BaseLayerModel.getBaseLayer(payloadSearch);
+    const resplayers = await BaseLayerModel.getBaseLayer(payloadSearch);
+    const rows = resplayers.data;
     if (rows.length === 0) {
       return res.status(404).json({ message: "Data Not Found" });
     }
 
-    const response = await BaseLayerModel.deleteBaseLayer(id_product);
-    if (response.affectedRows > 0)
-      return res.status(200).json({ message: "Data Deleted" });
-
-    return res.status(500).json({ message: "something wrong!" });
+    const response = await BaseLayerModel.deleteBaseLayer(id);
+    return res.status(200).json({ message: "Data Deleted" });
   } catch (error) {
     next(error);
   }
