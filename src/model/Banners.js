@@ -1,7 +1,7 @@
 const db = require("../config/connectDb");
 
 // get Categories
-const getBanners = (body) => {
+const getBanners = async(body) => {
   let sqlQuery = `SELECT 
       b.*,
       JSON_ARRAYAGG(
@@ -16,40 +16,45 @@ const getBanners = (body) => {
   const params = [];
 
   if (body.id) {
-    sqlQuery += " AND id = ?";
+    sqlQuery += " AND b.id = ?";
     params.push(body.id);
   }
 
   if (body.uuid_category) {
-    sqlQuery += " AND uuid_category = ?";
+    sqlQuery += " AND b.uuid_category = ?";
     params.push(body.uuid_category);
   }
 
-  const data = db.execute(sqlQuery, params);
+  const [data] = await db.execute(sqlQuery, params);
+  if(!data[0].id){
+    return []
+  }
+
   return data;
 };
 
-const insertBanners = (body) => {
-  const { uuid_category, image, currentDate, id_product } = body;
+const insertBanners = async(body) => {
+  const { uuid_category, image, id_product, type } = body;
 
   // Query untuk menyimpan data kategori baru
   const query =
-    "INSERT INTO banners (uuid_category, image, id_product, created_at) VALUES (?, ?, ?, ?)";
-  const values = [uuid_category, image, id_product, currentDate];
+    "INSERT INTO banners (uuid_category, image, id_product, type) VALUES (?, ?, ?, ?)";
+  const values = [uuid_category, image, id_product, type];
 
-  return db.execute(query, values);
+  return await db.execute(query, values);
 };
 
-const updateBanners = (body) => {
-  const { uuid_category, image, id } = body;
+const updateBanners = async(body) => {
+  const { uuid_category, image, type, id } = body;
 
   // Waktu sekarang
 
   // Query untuk menyimpan data kategori baru
-  const query = "UPDATE banners SET uuid_category=?, image=? WHERE id=?";
-  const params = [uuid_category, image, id];
+  const query =
+    "UPDATE banners SET uuid_category=?, type=?, image=? WHERE id=?";
+  const params = [uuid_category, type, image, id];
 
-  return db.execute(query, params);
+  return await db.execute(query, params);
 };
 
 const deleteBanners = async (id) => {

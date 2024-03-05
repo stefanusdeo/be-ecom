@@ -4,7 +4,7 @@ const { v4: uuidv4 } = require("uuid");
 
 const get = async (req, res, next) => {
   try {
-    const [rows] = await BannersModel.getBanners(req.query);
+    const rows = await BannersModel.getBanners(req.query);
 
     return res.json({
       message: "Success Get Data",
@@ -17,8 +17,7 @@ const get = async (req, res, next) => {
 
 const insert = async (req, res, next) => {
   try {
-    const { uuid_category, id_product } = req.body;
-    const image = req.file.filename;
+    const { uuid_category, id_product, image, type } = req.body;
 
     if (!image) {
       return res.status(400).json({ message: "Image Require" });
@@ -26,6 +25,10 @@ const insert = async (req, res, next) => {
 
     if (!id_product) {
       return res.status(400).json({ message: "Product Require" });
+    }
+
+    if (!type) {
+      return res.status(400).json({ message: "Type Require" });
     }
 
     //check
@@ -43,6 +46,7 @@ const insert = async (req, res, next) => {
       uuid_category,
       image,
       id_product,
+      type
     });
     return res.status(200).json({ message: "Success Add Data" });
   } catch (error) {
@@ -52,7 +56,11 @@ const insert = async (req, res, next) => {
 
 const update = async (req, res, next) => {
   try {
-    const { uuid_category, created_at, image, id } = req.body;
+    const { uuid_category, created_at, type, image, id } = req.body;
+
+    if (!type) {
+      return res.status(400).json({ message: "Type Require" });
+    }
 
     const payloadCategory = {
       uuid: uuid_category,
@@ -67,7 +75,8 @@ const update = async (req, res, next) => {
     const updateValues = {
       id,
       uuid_category,
-      image: req.file ? req.file.filename : image, // Gunakan gambar baru jika dikirim, jika tidak, gunakan gambar yang ada di body
+      image,
+      type
     };
 
     const resp = await BannersModel.updateBanners(updateValues);

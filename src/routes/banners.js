@@ -7,28 +7,14 @@ const path = require("path");
 const route = express.Router();
 
 // controller
-const { get, insert, destroy } = require("../controller/bannersController");
+const { get, insert, destroy, update} = require("../controller/bannersController");
 
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, "uploads/"); // Direktori untuk menyimpan file yang diunggah
-  },
-  filename: function (req, file, cb) {
-    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
-    cb(
-      null,
-      file.fieldname + "-" + uniqueSuffix + path.extname(file.originalname)
-    );
-  },
-});
 
-const upload = multer({ storage: storage });
-
-route.post("/", auth, upload.single("image"), insert);
+route.post("/", auth, insert);
 
 route.get("/", get);
 
-// route.put("/", auth, updateSubCategory);
+route.put("/", auth, update);
 
 route.delete("/", auth, destroy);
 
