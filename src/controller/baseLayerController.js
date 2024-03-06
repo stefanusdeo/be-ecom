@@ -26,20 +26,20 @@ const getBaseLayers = async (req, res, next) => {
 
 const insertBaseLayers = async (req, res, next) => {
   try {
-    const { id_product, layers, number } = req.body;
+    const { id_product, layers, type } = req.body;
     if (!id_product) {
       return res.status(404).json({ message: "Product Not Found" });
     }
 
     const respLayers = await BaseLayerModel.getBaseLayer({
       id_product,
-      number,
+      type,
     });
     const listLayers = respLayers.data[0];
     if (listLayers.length > 0) {
       return res
         .status(404)
-        .json({ message: `layer number ${number} already exists` });
+        .json({ message: `layer type ${type} already exists` });
     }
 
     const [rows] = await ProductModel.getProductWithoutLang({ id: id_product });
@@ -50,7 +50,7 @@ const insertBaseLayers = async (req, res, next) => {
     const payloadInsert = {
       id_product,
       layers,
-      number,
+      type,
     };
 
     await BaseLayerModel.insertBaseLayer(payloadInsert);

@@ -21,9 +21,9 @@ const getBaseLayer = async (body) => {
     params.push(body.id_product);
   }
 
-  if (body.number) {
-    sqlQuery += " AND number = ?";
-    params.push(body.number);
+  if (body.type) {
+    sqlQuery += " AND type = ?";
+    params.push(body.type);
   }
 
   const page = body?.page || 1;
@@ -60,9 +60,9 @@ const getBaseLayer = async (body) => {
     paramsCount.push(body.id_product);
   }
 
-  if (body.number) {
-    sqlQuery += " AND b.number = ?";
-    paramsCount.push(body.number);
+  if (body.type) {
+    sqlQuery += " AND b.type = ?";
+    paramsCount.push(body.type);
   }
 
   const respCount = await db.execute(countQuery, paramsCount);
@@ -73,20 +73,20 @@ const getBaseLayer = async (body) => {
 };
 
 const insertBaseLayer = (body) => {
-  const { id_product, layers, number } = body;
+  const { id_product, layers, type } = body;
   const status = 1;
   const currentDate = new Date().toISOString().slice(0, 19).replace("T", " ");
   // Query untuk menyimpan data kategori baru
   const query =
-    "INSERT INTO baselayers (id_product, layers,number, created_at, status) VALUES (?, ?, ?, ?, ?)";
-  const values = [id_product, layers, number, currentDate, status];
+    "INSERT INTO baselayers (id_product, layers,type, created_at, status) VALUES (?, ?, ?, ?, ?)";
+  const values = [id_product, layers, type, currentDate, status];
   return db.execute(query, values);
 };
 
 const updateBaseLayer = (body) => {
-  const { id_product, layers, id, number } = body;
+  const { id_product, layers, id, type } = body;
   // Query untuk menyimpan data kategori baru
-  const query = `UPDATE baselayers SET layers='${layers}', number='${number}', id_product='${id_product}' WHERE id='${id}'`;
+  const query = `UPDATE baselayers SET layers='${layers}', type='${type}', id_product='${id_product}' WHERE id='${id}'`;
   return db.execute(query);
 };
 
