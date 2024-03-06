@@ -14,7 +14,7 @@ const orderRoute = require("./src/routes/order");
 const aboutUsRoute = require("./src/routes/aboutus");
 const baselayerRoute = require("./src/routes/baselayers");
 const productImgRoute = require("./src/routes/productImg");
-const bannersController = require("./src/routes/banners")
+const bannersController = require("./src/routes/banners");
 
 // middleware
 const error = require("./src/middleware/error");
@@ -39,7 +39,7 @@ app.use(helmet());
 // );
 
 app.get("/", (req, res) => {
-  return res.send("Hiiii!!!, v1.4");
+  return res.send("Hiiii!!!, v1.5");
 });
 app.use("/images", express.static("uploads/"));
 app.use("/api/login", authRoute);
@@ -50,7 +50,7 @@ app.use("/api/product", productRoute);
 app.use("/api/product-img", productImgRoute);
 app.use("/api/order", orderRoute);
 app.use("/api/baselayer", baselayerRoute);
-app.use("/api/banners", bannersController)
+app.use("/api/banners", bannersController);
 
 app.use(error);
 

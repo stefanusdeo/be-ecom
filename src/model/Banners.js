@@ -1,16 +1,18 @@
 const db = require("../config/connectDb");
 
 // get Categories
-const getBanners = async(body) => {
+const getBanners = async (body) => {
   let sqlQuery = `SELECT 
-      b.*,
-      JSON_ARRAYAGG(
-        JSON_OBJECT('slug', p.slug, 'name', p.name, 'id', p.id)
-      ) AS product
-    FROM 
-      banners b
-    LEFT JOIN 
-      products p ON b.id_product = p.id
+  b.*,
+  JSON_OBJECT(
+    'product_id', p.id,
+    'product_name', p.name,
+    'slug',p.slug
+  ) AS product
+FROM 
+  banners b
+INNER JOIN
+  products p ON b.id_product = p.id
     WHERE 
       1`;
   const params = [];
@@ -24,16 +26,12 @@ const getBanners = async(body) => {
     sqlQuery += " AND b.uuid_category = ?";
     params.push(body.uuid_category);
   }
-
   const [data] = await db.execute(sqlQuery, params);
-  if(!data[0].id){
-    return []
-  }
 
-  return data;
+  return [data];
 };
 
-const insertBanners = async(body) => {
+const insertBanners = async (body) => {
   const { uuid_category, image, id_product, type } = body;
 
   // Query untuk menyimpan data kategori baru
@@ -44,7 +42,7 @@ const insertBanners = async(body) => {
   return await db.execute(query, values);
 };
 
-const updateBanners = async(body) => {
+const updateBanners = async (body) => {
   const { uuid_category, image, type, id } = body;
 
   // Waktu sekarang
