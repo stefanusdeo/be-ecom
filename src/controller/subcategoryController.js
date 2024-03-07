@@ -17,7 +17,7 @@ const getSubCategory = async (req, res, next) => {
 
 const insertSubCategory = async (req, res, next) => {
   try {
-    const { name, uuid_category } = req.body;
+    const { name, uuid_category, image_classic, image_custom } = req.body;
 
     //check
     const payloadCategory = {
@@ -53,6 +53,8 @@ const insertSubCategory = async (req, res, next) => {
       uuid_category,
       name,
       currentDate,
+      image_classic,
+      image_custom,
     };
 
     await SubCategory.insertSubCategory(payloadInsert);
@@ -68,7 +70,7 @@ const insertSubCategory = async (req, res, next) => {
 
 const updateSubCategory = async (req, res, next) => {
   try {
-    const { name, uuid_category, id } = req.body;
+    const { name, uuid_category, id, image_classic, image_custom } = req.body;
 
     //check
     const payloadCategory = {
@@ -85,6 +87,8 @@ const updateSubCategory = async (req, res, next) => {
       id,
       name,
       uuid_category,
+      image_classic,
+      image_custom,
     };
     await SubCategory.updateSubCategory(payloadUpdate);
 

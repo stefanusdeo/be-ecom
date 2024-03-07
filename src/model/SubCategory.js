@@ -31,22 +31,30 @@ const getSubCategory = (body) => {
 };
 
 const insertSubCategory = (body) => {
-  const { uuid_category, name, currentDate } = body;
+  const { uuid_category, name, currentDate, image_classic, image_custom } =
+    body;
   const slug = createSlug(name);
   // Query untuk menyimpan data kategori baru
   const query =
-    "INSERT INTO sub_category (uuid_category, slug, name, created_at) VALUES (?,?, ?, ?)";
-  const values = [uuid_category, slug, name, currentDate];
+    "INSERT INTO sub_category (uuid_category, slug, name, created_at, image_classic, image_custom) VALUES (?,?, ?, ?, ?, ?)";
+  const values = [
+    uuid_category,
+    slug,
+    name,
+    currentDate,
+    image_classic,
+    image_custom,
+  ];
 
   return db.execute(query, values);
 };
 
 const updateSubCategory = (body) => {
-  const { name, id, uuid_category } = body;
+  const { name, id, uuid_category, image_classic, image_custom } = body;
   const slug = createSlug(name);
 
   // Query untuk menyimpan data kategori baru
-  const query = `UPDATE sub_category SET uuid_category='${uuid_category}', name='${name}', slug='${slug}' WHERE id='${id}'`;
+  const query = `UPDATE sub_category SET uuid_category='${uuid_category}', name='${name}', slug='${slug}', image_classic='${image_classic}', image_custom='${image_custom}' WHERE id='${id}'`;
 
   return db.execute(query);
 };
