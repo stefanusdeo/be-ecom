@@ -2,6 +2,35 @@ const db = require("../config/connectDb");
 const createSlug = require("../config/createSlug");
 
 // get Categories
+
+const getSubCategoryWithoutImg = (body) => {
+  let sqlQuery =
+    "SELECT uuid_category, slug, name, created_at FROM sub_category WHERE status=1";
+  const params = [];
+
+  if (body.category_uuid) {
+    sqlQuery += " AND uuid_category = ?";
+    params.push(body.category_uuid);
+  }
+
+  if (body.id) {
+    sqlQuery += " AND id = ?";
+    params.push(body.id);
+  }
+
+  if (body.slug) {
+    sqlQuery += " AND slug = ?";
+    params.push(body.slug);
+  }
+
+  if (body.name) {
+    sqlQuery += " AND name = ?";
+    params.push(body.name);
+  }
+
+  const data = db.execute(sqlQuery, params);
+  return data;
+};
 const getSubCategory = (body) => {
   let sqlQuery = "SELECT * FROM sub_category WHERE status=1";
   const params = [];
@@ -70,4 +99,5 @@ module.exports = {
   insertSubCategory,
   updateSubCategory,
   deleteSubCategory,
+  getSubCategoryWithoutImg,
 };

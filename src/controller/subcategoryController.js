@@ -4,11 +4,19 @@ const { v4: uuidv4 } = require("uuid");
 
 const getSubCategory = async (req, res, next) => {
   try {
-    const [rows] = await SubCategory.getSubCategory(req.query);
+    let data = [];
+    console.log(req.query);
+    if (req.query.type === "image") {
+      const [rows] = await SubCategory.getSubCategory(req.query);
+      data = rows;
+    } else {
+      const [rows] = await SubCategory.getSubCategoryWithoutImg(req.query);
+      data = rows;
+    }
 
     return res.json({
       message: "Success Get Data",
-      data: rows,
+      data: data,
     });
   } catch (error) {
     next(error);
