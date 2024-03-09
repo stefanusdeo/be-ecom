@@ -15,7 +15,6 @@ const getCategories = (body) => {
     params.push(body.name);
   }
 
-  console.log(params);
   const data = db.execute(sqlQuery, params);
   return data;
 };

@@ -136,9 +136,6 @@ const getProducts = async (body, page = 1, pageSize = 10) => {
     paramsCount.push(`%${body.name}%`);
   }
 
-  // Eksekusi query untuk menghitung total data
-  console.log(sqlQuery);
-  console.log(params);
   const respCount = await db.execute(countQuery, paramsCount);
   return {
     pagination: respCount,
