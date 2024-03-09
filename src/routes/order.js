@@ -1,6 +1,7 @@
 const express = require("express");
 
 const auth = require("../middleware/auth");
+const rateLimit = require("../middleware/rateLimit");
 
 const route = express.Router();
 
@@ -11,7 +12,7 @@ const {
   updateStatusOrder,
 } = require("../controller/orderController");
 
-route.post("/", auth, insertOrder);
+route.post("/", rateLimit, insertOrder);
 
 route.get("/", auth, getOrders);
 

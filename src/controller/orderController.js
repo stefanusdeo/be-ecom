@@ -2,7 +2,9 @@ const { v4: uuidv4 } = require("uuid");
 const OrderModel = require("../model/Orders");
 const OrderItemsModel = require("../model/Order_items");
 const ProductModel = require("../model/Product");
+const CategoryModel = require("../model/Category");
 const db = require("../config/connectDb");
+const { sendMail } = require("../utils/email");
 
 const getOrders = async (req, res, next) => {
   try {
@@ -46,6 +48,7 @@ const insertOrder = async (req, res, next) => {
       city,
       products,
       currency,
+      uuid_category,
     } = req.body;
     const uuid = uuidv4();
 
@@ -61,6 +64,17 @@ const insertOrder = async (req, res, next) => {
       currentDate: new Date().toISOString().slice(0, 19).replace("T", " "),
       status: 1,
     };
+    if (products.length < 1)
+      return res.status(400).json({ message: "Invalid Product" });
+
+    if (!uuid_category)
+      return res.status(400).json({ message: "Invalid Category" });
+
+    const [dataCategory] = await CategoryModel.getCategories({
+      uuid: uuid_category,
+    });
+    if (dataCategory.length < 1)
+      return res.status(404).json({ message: "Category Not Found!" });
     const [order] = await OrderModel.insertOrders(payloadOrder, connection);
     const orderId = order.insertId;
     const payloadGetOrder = {
@@ -86,6 +100,7 @@ const insertOrder = async (req, res, next) => {
         price_per_product:
           currency === "DOLAR" ? rows[0].price_dolar : rows[0].price_chf,
         currentDate: new Date().toISOString().slice(0, 19).replace("T", " "),
+        image_custom: product?.image_custom || null,
       };
       const respOi = await OrderItemsModel.insertOrderItems(
         payloadOrderItems,
@@ -95,6 +110,7 @@ const insertOrder = async (req, res, next) => {
     }
 
     await connection.commit();
+    // await sendMail(email, name, dataCategory[0].name);
     return res.json({
       message: "success Add Data",
     });

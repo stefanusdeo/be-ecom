@@ -53,18 +53,26 @@ const getOrderItems = async (body) => {
 };
 
 const insertOrderItems = (body, connection) => {
-  const { uuid, uuid_order, id_product, qty, price_per_product, currentDate } =
-    body;
+  const {
+    uuid,
+    uuid_order,
+    id_product,
+    qty,
+    price_per_product,
+    currentDate,
+    image_custom,
+  } = body;
 
   // Query untuk menyimpan data kategori baru
   const query =
-    "INSERT INTO order_items (uuid, uuid_order, id_product, qty, price_per_product, created_at) VALUES (?, ?, ?, ?, ?, ?)";
+    "INSERT INTO order_items (uuid, uuid_order, id_product, qty, price_per_product, image_custom, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)";
   const values = [
     uuid,
     uuid_order,
     id_product,
     qty,
     price_per_product,
+    image_custom,
     currentDate,
   ];
   console.log(values);

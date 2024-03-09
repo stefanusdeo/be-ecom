@@ -24,6 +24,11 @@ const getProductWithoutLang = async (body) => {
     params.push(body.category_uuid);
   }
 
+  if (body.is_custom) {
+    sqlQuery += " AND is_custom = ?";
+    params.push(body.is_custom);
+  }
+
   return await db.execute(sqlQuery, params);
 };
 // get Product
@@ -73,6 +78,11 @@ const getProducts = async (body, page = 1, pageSize = 10) => {
     params.push(body.category_uuid);
   }
 
+  if (body.is_custom) {
+    sqlQuery += " AND p.is_custom = ?";
+    params.push(body.is_custom);
+  }
+
   sqlQuery += " GROUP BY p.id, p.name"; // Grupkan hasil berdasarkan UUID dan nama produk
 
   if (page && pageSize) {
@@ -104,6 +114,11 @@ const getProducts = async (body, page = 1, pageSize = 10) => {
   if (body.slug_sub_category) {
     countQuery += " AND p.slug_sub_category = ?";
     paramsCount.push(body.slug_sub_category);
+  }
+
+  if (body.is_custom) {
+    countQuery += " AND p.is_custom = ?";
+    paramsCount.push(body.is_custom);
   }
 
   if (body.name) {
