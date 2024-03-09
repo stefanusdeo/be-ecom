@@ -63,11 +63,6 @@ const getProducts = async (body, page = 1, pageSize = 10) => {
     params.push(body.slug);
   }
 
-  if (body.name) {
-    sqlQuery += " AND p.name = ?";
-    params.push(body.name);
-  }
-
   if (body.status) {
     sqlQuery += " AND p.status = ?";
     params.push(body.status);
@@ -81,6 +76,11 @@ const getProducts = async (body, page = 1, pageSize = 10) => {
   if (body.is_custom) {
     sqlQuery += " AND p.is_custom = ?";
     params.push(body.is_custom);
+  }
+
+  if (body.name) {
+    sqlQuery += " AND p.name LIKE ?";
+    params.push(`%${body.name}%`);
   }
 
   sqlQuery += " GROUP BY p.id, p.name"; // Grupkan hasil berdasarkan UUID dan nama produk
@@ -121,11 +121,6 @@ const getProducts = async (body, page = 1, pageSize = 10) => {
     paramsCount.push(body.is_custom);
   }
 
-  if (body.name) {
-    countQuery += " AND p.name = ?";
-    paramsCount.push(body.name);
-  }
-
   if (body.status) {
     countQuery += " AND p.status = ?";
     paramsCount.push(body.status);
@@ -136,7 +131,14 @@ const getProducts = async (body, page = 1, pageSize = 10) => {
     paramsCount.push(body.category_uuid);
   }
 
+  if (body.name) {
+    countQuery += " AND p.name LIKE ?";
+    paramsCount.push(`%${body.name}%`);
+  }
+
   // Eksekusi query untuk menghitung total data
+  console.log(sqlQuery);
+  console.log(params);
   const respCount = await db.execute(countQuery, paramsCount);
   return {
     pagination: respCount,
@@ -166,6 +168,12 @@ const insertProduct = async (body, connection) => {
     is_custom,
   } = body;
   const slug = await createSlug(name);
+  let sizeData = "";
+  if (typeof size === "string") {
+    sizeData = size;
+  } else {
+    sizeData = JSON.stringify(size);
+  }
   const status = 1;
   const sqlQuery = `INSERT INTO products (category_uuid, slug_sub_category, name, slug, main_img, size, price_dolar, price_chf, price_eur, status, is_custom) 
   VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
@@ -175,7 +183,7 @@ const insertProduct = async (body, connection) => {
     name,
     slug,
     main_img,
-    size,
+    sizeData,
     price_dolar,
     price_chf,
     price_eur,
@@ -198,7 +206,13 @@ const updateProduct = (body, connection) => {
     id,
   } = body;
   const slug = createSlug(name);
-  const sqlQuery = `UPDATE products SET category_uuid='${uuid_category}', slug_sub_category='${slug_sub_category}', name='${name}', slug='${slug}', main_img='${main_img}', size='${size}', price_dolar='${price_dolar}', price_chf='${price_chf}', price_eur='${price_eur}', is_custom='${is_custom}' WHERE id=${id}`;
+  let sizeData = "";
+  if (typeof size === "string") {
+    sizeData = size;
+  } else {
+    sizeData = JSON.stringify(size);
+  }
+  const sqlQuery = `UPDATE products SET category_uuid='${uuid_category}', slug_sub_category='${slug_sub_category}', name='${name}', slug='${slug}', main_img='${main_img}', size='${sizeData}', price_dolar='${price_dolar}', price_chf='${price_chf}', price_eur='${price_eur}', is_custom='${is_custom}' WHERE id=${id}`;
   return connection.execute(sqlQuery);
 };
 

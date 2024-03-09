@@ -98,7 +98,11 @@ const insertOrder = async (req, res, next) => {
         id_product: rows[0].id,
         qty: product.qty,
         price_per_product:
-          currency === "DOLAR" ? rows[0].price_dolar : rows[0].price_chf,
+          currency === "USD"
+            ? rows[0].price_dolar
+            : currency === "CHF"
+            ? rows[0].price_chf
+            : rows[0].price_eur,
         currentDate: new Date().toISOString().slice(0, 19).replace("T", " "),
         image_custom: product?.image_custom || null,
       };
