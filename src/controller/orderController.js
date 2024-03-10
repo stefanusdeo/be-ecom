@@ -5,6 +5,7 @@ const ProductModel = require("../model/Product");
 const CategoryModel = require("../model/Category");
 const db = require("../config/connectDb");
 const { sendMail } = require("../utils/email");
+const { countryData } = require("../utils/masterCountry");
 
 const getOrders = async (req, res, next) => {
   try {
@@ -51,6 +52,12 @@ const insertOrder = async (req, res, next) => {
       uuid_category,
     } = req.body;
     const uuid = uuidv4();
+    const currencyData = countryData.find(
+      (data) => data.name === currency.toLowerCase()
+    );
+
+    if (!currencyData)
+      return res.status(400).json({ message: "Country invalid" });
 
     const payloadOrder = {
       uuid,
@@ -63,7 +70,13 @@ const insertOrder = async (req, res, next) => {
       city,
       currentDate: new Date().toISOString().slice(0, 19).replace("T", " "),
       status: 1,
+      currency: currencyData.currency,
+      shipping_price: currencyData.shipping,
     };
+
+    if (!products)
+      return res.status(400).json({ message: "Products Not Found" });
+
     if (products.length < 1)
       return res.status(400).json({ message: "Invalid Product" });
 
@@ -125,31 +138,7 @@ const insertOrder = async (req, res, next) => {
     await connection.release();
   }
 };
-
-const updateStatusOrder = async (req, res, next) => {
-  const connection = db.getConnection();
-  try {
-    await connection.beginTransaction();
-    const { uuid, status } = req.body;
-    const [data] = await OrderModel.getOrdersWithotChild({ uuid }, connection);
-
-    let dataOrder = data[0];
-    let payloadOrder = {
-      ...dataOrder,
-      status,
-    };
-
-    await OrderModel.updateOrders(payloadOrder, connection);
-
-    await connection.commit();
-  } catch (error) {
-    await connection.rollback();
-    next(error);
-  }
-};
-
 module.exports = {
   insertOrder,
   getOrders,
-  updateStatusOrder,
 };

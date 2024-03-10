@@ -193,7 +193,10 @@ const updateProduct = async (req, res, next) => {
       id,
     };
     const [product] = await ProductModel.updateProduct(payload, connection);
-    const id_product = product.insertId;
+    const id_product = id;
+
+    if (!language)
+      return res.status(400).json({ message: "Language is Required" });
 
     const respDel = await ProductLangModel.deleteProductLangWithIdProduct(
       id_product,

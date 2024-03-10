@@ -40,7 +40,7 @@ app.use(helmet());
 // );
 
 app.get("/", (req, res) => {
-  return res.send("Hiiii!!!, v1.11");
+  return res.send("Hiiii!!!, v1.12");
 });
 app.use("/images", express.static("uploads/"));
 app.use("/api/login", authRoute);

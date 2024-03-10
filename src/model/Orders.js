@@ -135,11 +135,13 @@ const insertOrders = async (body, connection) => {
     city,
     status,
     currentDate,
+    currency,
+    shipping_price,
   } = body;
 
   // Query untuk menyimpan data kategori baru
   const query =
-    "INSERT INTO orders (uuid, email, country, name, address, postal_code, phone, city, status, created_at) VALUES (?, ?, ?, ?, ?, ?, ? , ?, ?, ?)";
+    "INSERT INTO orders (uuid, email, country, name, address, postal_code, phone, city, status, currency, shipping_price, created_at) VALUES (?, ?, ?, ?, ?, ?, ? , ?, ?, ?, ?, ?)";
   const values = [
     uuid,
     email,
@@ -150,6 +152,8 @@ const insertOrders = async (body, connection) => {
     phone,
     city,
     status,
+    currency,
+    shipping_price,
     currentDate,
   ];
 
