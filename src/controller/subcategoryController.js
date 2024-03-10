@@ -5,7 +5,6 @@ const { v4: uuidv4 } = require("uuid");
 const getSubCategory = async (req, res, next) => {
   try {
     let data = [];
-    console.log(req.query);
     if (req.query.type === "image") {
       const [rows] = await SubCategory.getSubCategory(req.query);
       data = rows;

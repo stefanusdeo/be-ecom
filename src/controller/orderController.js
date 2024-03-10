@@ -5,7 +5,7 @@ const ProductModel = require("../model/Product");
 const CategoryModel = require("../model/Category");
 const db = require("../config/connectDb");
 const { sendMail } = require("../utils/email");
-const { countryData } = require("../utils/masterCountry");
+const countryData = require("../utils/masterCountry");
 
 const getOrders = async (req, res, next) => {
   try {
@@ -53,7 +53,7 @@ const insertOrder = async (req, res, next) => {
     } = req.body;
     const uuid = uuidv4();
     const currencyData = countryData.find(
-      (data) => data.name === currency.toLowerCase()
+      (data) => data.name === country.toLowerCase()
     );
 
     if (!currencyData)
@@ -123,7 +123,6 @@ const insertOrder = async (req, res, next) => {
         payloadOrderItems,
         connection
       );
-      console.log(respOi);
     }
 
     await connection.commit();

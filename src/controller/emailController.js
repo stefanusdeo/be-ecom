@@ -8,7 +8,6 @@ const getEmail = async (req, res, next) => {
     const [rows] = resp.data;
     const [totalData] = resp.pagination;
 
-    console.log(rows);
     const pagination = {
       page,
       pageSize,

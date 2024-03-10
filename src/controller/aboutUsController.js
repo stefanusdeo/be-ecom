@@ -50,7 +50,6 @@ const insertAboutUs = async (req, res, next) => {
       content,
       currentDate,
     };
-    console.log(payloadInsert);
     await AboutUsModel.insertAboutUs(payloadInsert);
 
     return res.json({

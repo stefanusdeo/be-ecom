@@ -75,7 +75,7 @@ const insertOrderItems = (body, connection) => {
     image_custom,
     currentDate,
   ];
-  console.log(values);
+
   return connection.execute(query, values);
 };
 
