@@ -26,6 +26,11 @@ INNER JOIN
     sqlQuery += " AND b.uuid_category = ?";
     params.push(body.uuid_category);
   }
+
+  if (body.type) {
+    sqlQuery += " AND b.type = ?";
+    params.push(body.type);
+  }
   const [data] = await db.execute(sqlQuery, params);
 
   return [data];
