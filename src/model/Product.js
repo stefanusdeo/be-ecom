@@ -41,10 +41,10 @@ const getProducts = async (body, page = 1, pageSize = 10) => {
       ) AS product_lang
     FROM 
       products p
-    LEFT JOIN 
-      product_lang pl ON p.id = pl.id_product
+    
     WHERE 
-      1
+      1LEFT JOIN 
+      product_lang pl ON p.id = pl.id_product
   `;
 
   const params = [];

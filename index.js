@@ -16,6 +16,7 @@ const baselayerRoute = require("./src/routes/baselayers");
 const productImgRoute = require("./src/routes/productImg");
 const bannerRoute = require("./src/routes/banners");
 const emailRouter = require("./src/routes/email");
+const termConditionRoute = require("./src/routes/termConditions");
 
 // middleware
 const error = require("./src/middleware/error");
@@ -40,13 +41,14 @@ app.use(helmet());
 // );
 
 app.get("/", (req, res) => {
-  return res.send("Hiiii!!!, v1.14");
+  return res.send("Hiiii!!!, v1.15");
 });
 app.use("/images", express.static("uploads/"));
 app.use("/api/login", authRoute);
 app.use("/api/category", categoryRoute);
 app.use("/api/sub-category", subCategoryRoute);
 app.use("/api/about-us", aboutUsRoute);
+app.use("/api/about-us", termConditionRoute);
 app.use("/api/product", productRoute);
 app.use("/api/product-img", productImgRoute);
 app.use("/api/order", orderRoute);
