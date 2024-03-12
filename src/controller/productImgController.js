@@ -83,7 +83,7 @@ const updateProductImg = async (req, res, next) => {
 
 const deleteProductImg = async (req, res, next) => {
   try {
-    const { id } = req.body;
+    const { id } = req.query;
     if (!req.body.id)
       return res.status(400).json({ message: "id product required" });
 

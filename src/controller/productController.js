@@ -231,7 +231,7 @@ const updateProduct = async (req, res, next) => {
 
 const deleteProduct = async (req, res, next) => {
   try {
-    const { id } = req.body;
+    const { id } = req.query;
     const connection = await db.getConnection();
     const payloadSearch = {
       id,

@@ -115,7 +115,7 @@ const update = async (req, res, next) => {
 
 const destroy = async (req, res, next) => {
   try {
-    const { id } = req.body;
+    const { id } = req.query;
 
     const payloadSearch = {
       id,
