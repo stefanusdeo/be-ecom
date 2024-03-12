@@ -41,14 +41,14 @@ app.use(helmet());
 // );
 
 app.get("/", (req, res) => {
-  return res.send("Hiiii!!!, v1.16");
+  return res.send("Hiiii!!!, v1.17");
 });
 app.use("/images", express.static("uploads/"));
 app.use("/api/login", authRoute);
 app.use("/api/category", categoryRoute);
 app.use("/api/sub-category", subCategoryRoute);
 app.use("/api/about-us", aboutUsRoute);
-app.use("/api/about-us", termConditionRoute);
+app.use("/api/terms-conditions", termConditionRoute);
 app.use("/api/product", productRoute);
 app.use("/api/product-img", productImgRoute);
 app.use("/api/order", orderRoute);
