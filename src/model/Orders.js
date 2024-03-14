@@ -65,7 +65,7 @@ const getOrders = async (body) => {
     sqlQuery += " AND o.status = ?";
     params.push(body.status);
   }
-
+  sqlQuery += " GROUP BY o.id";
   const offset = (parseInt(body.page) - 1) * parseInt(body.pageSize);
 
   // Menambahkan LIMIT dan OFFSET ke query SQL

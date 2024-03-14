@@ -5,7 +5,7 @@ const createSlug = require("../config/createSlug");
 
 const getSubCategoryWithoutImg = (body) => {
   let sqlQuery =
-    "SELECT uuid_category, slug, name, created_at FROM sub_category WHERE status=1";
+    "SELECT uuid_category, slug, name, created_at, is_custom FROM sub_category WHERE status=1";
   const params = [];
 
   if (body.category_uuid) {
