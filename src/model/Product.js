@@ -90,7 +90,9 @@ const getProducts = async (body, page = 1, pageSize = 10) => {
 
   sqlQuery += " GROUP BY p.id, p.name"; // Grupkan hasil berdasarkan UUID dan nama produk
 
-  sqlQuery += ` ORDER BY ${body.sortBy} ${body.sortOrder}`;
+  if (body.sortBy && body.sortOrder) {
+    sqlQuery += ` ORDER BY ${body.sortBy} ${body.sortOrder}`;
+  }
 
   if (page && pageSize) {
     const offset = (page - 1) * pageSize;
