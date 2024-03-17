@@ -61,11 +61,16 @@ const insertOrderItems = (body, connection) => {
     price_per_product,
     currentDate,
     image_custom,
+    image_one,
+    image_two,
+    image_three,
+    image_four,
+    size,
   } = body;
 
   // Query untuk menyimpan data kategori baru
   const query =
-    "INSERT INTO order_items (uuid, uuid_order, id_product, qty, price_per_product, image_custom, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)";
+    "INSERT INTO order_items (uuid, uuid_order, id_product, qty, price_per_product, image_custom, image_one, image_two, image_three, image_four, size, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
   const values = [
     uuid,
     uuid_order,
@@ -74,6 +79,11 @@ const insertOrderItems = (body, connection) => {
     price_per_product,
     image_custom,
     currentDate,
+    image_one,
+    image_two,
+    image_three,
+    image_four,
+    size,
   ];
 
   return connection.execute(query, values);

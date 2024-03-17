@@ -83,7 +83,14 @@ const getProducts = async (body, page = 1, pageSize = 10) => {
     params.push(`%${body.name}%`);
   }
 
+  if (body.minPrice !== undefined && body.maxPrice !== undefined) {
+    sqlQuery += ` AND p.${body.column_price} BETWEEN ? AND ?`;
+    params.push(body.minPrice, body.maxPrice);
+  }
+
   sqlQuery += " GROUP BY p.id, p.name"; // Grupkan hasil berdasarkan UUID dan nama produk
+
+  sqlQuery += ` ORDER BY ${body.sortBy} ${body.sortOrder}`;
 
   if (page && pageSize) {
     const offset = (page - 1) * pageSize;
@@ -134,6 +141,11 @@ const getProducts = async (body, page = 1, pageSize = 10) => {
   if (body.name) {
     countQuery += " AND p.name LIKE ?";
     paramsCount.push(`%${body.name}%`);
+  }
+
+  if (body.minPrice !== undefined && body.maxPrice !== undefined) {
+    countQuery += ` AND p.${body.column_price} BETWEEN ? AND ?`;
+    paramsCount.push(body.minPrice, body.maxPrice);
   }
 
   const respCount = await db.execute(countQuery, paramsCount);

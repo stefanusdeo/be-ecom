@@ -9,7 +9,27 @@ const getProducts = async (req, res, next) => {
   try {
     const page = req.query?.page || 1;
     const pageSize = req.query?.pageSize || 10;
-    const resp = await ProductModel.getProducts(req.query, page, pageSize);
+    const currency = req.query?.currency || "";
+    const payload = {
+      ...req.query,
+      column_price:
+        currency === "CHF"
+          ? "price_chf"
+          : currency === "USD"
+          ? "price_dolar"
+          : currency === "EUR"
+          ? "price_eur"
+          : undefined,
+      sortBy:
+        req.query.sortBy === "price"
+          ? currency === "CHF"
+            ? "price_chf"
+            : currency === "USD"
+            ? "price_dolar"
+            : "price_eur"
+          : req.query.sortBy,
+    };
+    const resp = await ProductModel.getProducts(payload, page, pageSize);
     const [rows] = resp.data;
     const [totalData] = resp.pagination;
     const pagination = {
@@ -111,6 +131,7 @@ const insertProduct = async (req, res, next) => {
         information: lang.information,
         language: lang.language,
       };
+      console.log(payloadProLang);
       await ProductLangModel.insertProductLang(payloadProLang, connection);
     }
 

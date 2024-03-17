@@ -118,6 +118,11 @@ const insertOrder = async (req, res, next) => {
             : rows[0].price_eur,
         currentDate: new Date().toISOString().slice(0, 19).replace("T", " "),
         image_custom: product?.image_custom || null,
+        image_one: product?.image_one || null,
+        image_two: product?.image_two || null,
+        image_three: product?.image_three || null,
+        image_four: product?.image_four || null,
+        size: product?.size,
       };
       const respOi = await OrderItemsModel.insertOrderItems(
         payloadOrderItems,
