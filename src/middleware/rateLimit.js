@@ -4,7 +4,7 @@ const setRateLimit = require("express-rate-limit");
 const rateLimitMiddleware = setRateLimit({
   windowMs: 5 * 60 * 1000,
   max: 2,
-  message: "You have exceeded your 5 requests per minute limit.",
+  message: "too many request",
   headers: true,
 });
 

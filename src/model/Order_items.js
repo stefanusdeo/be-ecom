@@ -78,12 +78,12 @@ const insertOrderItems = (body, connection) => {
     qty,
     price_per_product,
     image_custom,
-    currentDate,
     image_one,
     image_two,
     image_three,
     image_four,
     size,
+    currentDate,
   ];
 
   return connection.execute(query, values);

@@ -6,6 +6,6 @@ module.exports = function (err, req, res, next) {
       message: err.message,
     });
   }
-  console.error(err.message);
+  console.error(err);
   return res.status(500).json({ message: "Server Error" });
 };

@@ -103,7 +103,19 @@ const insertOrder = async (req, res, next) => {
         id: product.id,
       };
       let [rows] = await ProductModel.getProductWithoutLang(payload);
-      if (rows.length !== 1) throw new Error("Product Not Found!");
+      if (rows.length !== 1)
+        return res.status(404).json({ message: "product not found" });
+
+      const isProductCustom = rows[0].is_custom;
+
+      if (isProductCustom === 1) {
+        if (
+          product?.image_custom === undefined ||
+          product?.image_custom === ""
+        ) {
+          return res.status(400).json({ message: "please custom product" });
+        }
+      }
 
       let payloadOrderItems = {
         uuid: uuidv4(),
@@ -124,6 +136,7 @@ const insertOrder = async (req, res, next) => {
         image_four: product?.image_four || null,
         size: product?.size,
       };
+      console.log(payloadOrderItems);
       const respOi = await OrderItemsModel.insertOrderItems(
         payloadOrderItems,
         connection
