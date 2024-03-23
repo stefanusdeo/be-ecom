@@ -118,8 +118,10 @@ const insertOrder = async (req, res, next) => {
       payloadGetOrder,
       connection
     );
+
     let productAll = [];
     const dataOrder = respOrder[0];
+
     for (const product of products) {
       const payload = {
         id: product.id,
@@ -146,10 +148,10 @@ const insertOrder = async (req, res, next) => {
         qty: product.qty,
         price_per_product:
           currency === "USD"
-            ? rows[0].price_dolar
+            ? parseInt(rows[0].price_dolar)
             : currency === "CHF"
-            ? rows[0].price_chf
-            : rows[0].price_eur,
+            ? parseInt(rows[0].price_chf)
+            : parseInt(rows[0].price_eur),
         currentDate: new Date().toISOString().slice(0, 19).replace("T", " "),
         image_custom: product?.image_custom || null,
         image_one: product?.image_one || null,
@@ -164,9 +166,8 @@ const insertOrder = async (req, res, next) => {
           currency: currency.toLowerCase(),
           product_data: {
             name: rows[0].name,
-            images: [rows[0].main_image],
           },
-          unit_amoun: payloadOrderItems.price_per_product,
+          unit_amount: payloadOrderItems.price_per_product * 10,
         },
         quantity: payloadOrderItems.qty,
       };
@@ -178,20 +179,21 @@ const insertOrder = async (req, res, next) => {
         connection
       );
     }
+    console.log(productAll);
 
-    const session = await stripe.checkout.session.create({
+    const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
       line_items: productAll,
       mode: "payment",
-      success_url: "",
-      canel_url: "",
+      success_url: `${dataCategory[0].name}transactionStatus?status=success`,
+      cancel_url: `${dataCategory[0].name}transactionStatus?status=failed`,
     });
 
     await connection.commit();
     await sendMail(email, name, dataCategory[0].name);
     return res.json({
       message: "success Add Data",
-      session: { id: session.id },
+      url: session.url,
     });
   } catch (error) {
     await connection.rollback();
