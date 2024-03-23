@@ -6,10 +6,15 @@ const rateLimit = require("../middleware/rateLimit");
 const route = express.Router();
 
 // controller
-const { getOrders, insertOrder } = require("../controller/orderController");
+const {
+  getOrders,
+  insertOrder,
+  getOrder,
+} = require("../controller/orderController");
 
 route.post("/", rateLimit, insertOrder);
 
 route.get("/", auth, getOrders);
+route.get("/by-uuid", auth, getOrder);
 
 module.exports = route;

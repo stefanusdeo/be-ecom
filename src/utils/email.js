@@ -15,9 +15,12 @@ const transporter = nodemailer.createTransport({
 const sendMail = (to, name, store) => {
   transporter.sendMail(
     {
-      from: "your.email@gmail.com", // Gantilah dengan email pengirim
-      to, // Gantilah dengan email penerima
-      subject: "Pesanan Sedang di Proses",
+      from: {
+        name: store,
+        address: process.env.NODE_EMAIL_SENDER,
+      }, // Gantilah dengan email pengirim
+      to: [to.toString()], // Gantilah dengan email penerima
+      subject: "Your order already process",
       text: `Hai ${name},
     
         Thank you for placing an order with our store. We would like to inform you that your order is currently being processed.

@@ -1,4 +1,5 @@
 const { v4: uuidv4 } = require("uuid");
+require("dotenv").config();
 const OrderModel = require("../model/Orders");
 const OrderItemsModel = require("../model/Order_items");
 const ProductModel = require("../model/Product");
@@ -6,6 +7,8 @@ const CategoryModel = require("../model/Category");
 const db = require("../config/connectDb");
 const { sendMail } = require("../utils/email");
 const countryData = require("../utils/masterCountry");
+
+const stripe = require("stripe")(process.env.STRIPE_KEY);
 
 const getOrders = async (req, res, next) => {
   try {
@@ -30,6 +33,24 @@ const getOrders = async (req, res, next) => {
       data: rows.length > 0 ? rows : [],
       pagination,
     });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const getOrder = async (req, res, next) => {
+  try {
+    const { uuid } = req.query;
+
+    if (!uuid) return res.send(404).json({ message: "UUID Not Found" });
+
+    const [resp] = await OrderModel.getOrdersByUuid(req.query);
+
+    if (resp.length === 0) {
+      return res.status(404).json({ message: "Data Not Found" });
+    } else {
+      return res.send({ message: "success get data", data: resp[0] });
+    }
   } catch (error) {
     next(error);
   }
@@ -97,6 +118,7 @@ const insertOrder = async (req, res, next) => {
       payloadGetOrder,
       connection
     );
+    let productAll = [];
     const dataOrder = respOrder[0];
     for (const product of products) {
       const payload = {
@@ -136,17 +158,40 @@ const insertOrder = async (req, res, next) => {
         image_four: product?.image_four || null,
         size: product?.size,
       };
-      console.log(payloadOrderItems);
+
+      const objProduct = {
+        price_data: {
+          currency: currency.toLowerCase(),
+          product_data: {
+            name: rows[0].name,
+            images: [rows[0].main_image],
+          },
+          unit_amoun: payloadOrderItems.price_per_product,
+        },
+        quantity: payloadOrderItems.qty,
+      };
+
+      productAll.push(objProduct);
+
       const respOi = await OrderItemsModel.insertOrderItems(
         payloadOrderItems,
         connection
       );
     }
 
+    const session = await stripe.checkout.session.create({
+      payment_method_types: ["card"],
+      line_items: productAll,
+      mode: "payment",
+      success_url: "",
+      canel_url: "",
+    });
+
     await connection.commit();
-    // await sendMail(email, name, dataCategory[0].name);
+    await sendMail(email, name, dataCategory[0].name);
     return res.json({
       message: "success Add Data",
+      session: { id: session.id },
     });
   } catch (error) {
     await connection.rollback();
@@ -158,4 +203,5 @@ const insertOrder = async (req, res, next) => {
 module.exports = {
   insertOrder,
   getOrders,
+  getOrder,
 };

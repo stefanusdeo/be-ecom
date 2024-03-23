@@ -16,7 +16,7 @@ const getOrdersWithotChild = async (body, connection) => {
   const data = await connection.execute(sqlQuery, params);
   return data;
 };
-// get Categories
+// get Orders
 const getOrders = async (body) => {
   let sqlQuery = `SELECT 
       o.*,
@@ -67,6 +67,7 @@ const getOrders = async (body) => {
   }
   sqlQuery += " GROUP BY o.id";
   const offset = (parseInt(body.page) - 1) * parseInt(body.pageSize);
+  sqlQuery += ` ORDER BY id desc`;
 
   // Menambahkan LIMIT dan OFFSET ke query SQL
   sqlQuery += ` LIMIT ${parseInt(body.pageSize)} OFFSET ${offset}`;
@@ -121,6 +122,31 @@ const getOrders = async (body) => {
     data: products,
     pagination: respCount,
   };
+};
+
+const getOrdersByUuid = async (body) => {
+  let sqlQuery = `SELECT 
+      o.*,
+      JSON_ARRAYAGG(
+        JSON_OBJECT('id_product', oi.id_product, 'qty', oi.qty, 'price_per_product', oi.price_per_product, 'image_custom', oi.image_custom, 'image_one', oi.image_one, 'image_two', oi.image_two, 'image_three', oi.image_three, 'image_four', oi.image_four, 'size', oi.size)
+      ) AS order_items
+    FROM 
+      orders o
+    LEFT JOIN 
+      order_items oi ON o.uuid = oi.uuid_order
+    WHERE 
+      1`;
+  const params = [];
+
+  if (body.uuid) {
+    sqlQuery += " AND o.uuid = ?";
+    params.push(body.uuid);
+  }
+  sqlQuery += " GROUP BY o.id";
+
+  const products = await db.execute(sqlQuery, params);
+
+  return products;
 };
 
 const insertOrders = async (body, connection) => {
@@ -202,4 +228,5 @@ module.exports = {
   updateOrders,
   deleteOrder,
   getOrdersWithotChild,
+  getOrdersByUuid,
 };
