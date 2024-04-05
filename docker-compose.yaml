@@ -5,7 +5,7 @@ services:
     build: . # Gunakan Dockerfile yang berada di direktori app/
     ports:
       - "8000:8000" # Port host : Port container
-    environment:
-      - NODE_ENV=develop # Contoh pengaturan variabel lingkungan
-    volumes:
-      - ./app:/app # Volume mapping untuk memperbarui perubahan langsung
+    env_file:
+      -  .env.production # Contoh pengaturan variabel lingkungan
+    # volumes:
+    #   - ./app:/app # Volume mapping untuk memperbarui perubahan langsung
