@@ -2,7 +2,7 @@
 FROM node:slim
 
 # Declaring env
-ENV NODE_ENV develop
+# ENV NODE_ENV qdevelop
 
 # Setting up the work directory
 WORKDIR /express-docker
