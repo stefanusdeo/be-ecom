@@ -1,0 +1,27 @@
+name: Deploy to production
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up SSH
+      run: |
+        mkdir -p ~/.ssh
+        echo "${{ secrets.PRIVATE_KEY }}" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+        ssh-keyscan 93.127.172.128 >> ~/.ssh/known_hosts
+
+    - name: Run SSH commands
+      run: |
+        # Ganti "your_server_ip" dengan alamat IP atau nama host server Anda.
+        ssh -i ~/.ssh/id_rsa root@93.127.172.128 'cd be-ecom && git restore . && git pull origin master && docker compose up --build'
