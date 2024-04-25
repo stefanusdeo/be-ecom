@@ -5,7 +5,7 @@ const OrderItemsModel = require("../model/Order_items");
 const ProductModel = require("../model/Product");
 const CategoryModel = require("../model/Category");
 const db = require("../config/connectDb");
-const { sendMail } = require("../utils/email");
+const { sendEmailOrder, sendEmailShipping } = require("../utils/email");
 const countryData = require("../utils/masterCountry");
 
 const stripe = require("stripe")(process.env.STRIPE_KEY);
@@ -179,7 +179,6 @@ const insertOrder = async (req, res, next) => {
         connection
       );
     }
-    console.log(productAll);
 
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
@@ -190,7 +189,7 @@ const insertOrder = async (req, res, next) => {
     });
 
     await connection.commit();
-    await sendMail(email, name, dataCategory[0].name);
+    await sendEmailOrder(email, name, dataCategory[0].name);
     return res.json({
       message: "success Add Data",
       url: session.url,
@@ -202,8 +201,34 @@ const insertOrder = async (req, res, next) => {
     await connection.release();
   }
 };
+
+const sendOrder = async (req, res, next) => {
+  try {
+    const { uuid, noShipping, shipping } = req.body;
+    const [checkOrder] = await OrderModel.getOrdersWithotChild(req.query);
+    const order = checkOrder[0];
+    if (!uuid || order.length === 0) {
+      return res.status(404).json({
+        message: "Order Not Found!",
+      });
+    }
+
+    const payload = {
+      ...order,
+      status: 2,
+    };
+    const resp = await OrderModel.updateOrders(payload);
+    await sendEmailShipping(order.name, noShipping, shipping);
+    return res.json({
+      message: "Success Update Order",
+    });
+  } catch (error) {
+    next(error);
+  }
+};
 module.exports = {
   insertOrder,
   getOrders,
   getOrder,
+  sendOrder,
 };

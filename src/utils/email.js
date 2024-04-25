@@ -12,7 +12,7 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-const sendMail = (to, name, store) => {
+const sendEmailOrder = (to, name, store) => {
   transporter.sendMail(
     {
       from: {
@@ -42,4 +42,30 @@ const sendMail = (to, name, store) => {
   );
 };
 
-module.exports = { sendMail };
+const sendEmailShipping = (name, noShipping, shipping) => {
+  transporter.sendMail(
+    {
+      from: {
+        name: store,
+        address: process.env.NODE_EMAIL_SENDER,
+      }, // Gantilah dengan email pengirim
+      to: [to.toString()], // Gantilah dengan email penerima
+      subject: "Your order already process",
+      text: `Hai ${name},
+    
+        It is your number shipping : ${noShipping} shipping by ${shipping}
+        
+        Thank you
+        ShinPro`,
+    },
+    (error, info) => {
+      if (error) {
+        console.error(error);
+      } else {
+        console.log("Email sent: " + info.response);
+      }
+    }
+  );
+};
+
+module.exports = { sendEmailOrder, sendEmailShipping };
